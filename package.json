@@ -1,0 +1,16 @@
+{
+  "name": "duck-hunt-phaser3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel src/index.html --open",
+    "build": "parcel build src/index.html"
+  },
+  "dependencies": {
+    "phaser": "^3.9.0"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.8.1"
+  }
+}
