@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 
+import { GAME_WIDTH, GAME_HEIGHT } from '../config/Constants';
+
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -34,8 +36,7 @@ export default class Game extends Phaser.Scene {
       this.cameras.main.flash();
       //this.cameras.main.shake(70);
     }, this);
-    
-    // TODO: Add animation by image sequence: http://labs.phaser.io/edit.html?src=src\animation\animation%20from%20png%20sequence.js
+
     // TODO: Add duck movement https://labs.phaser.io/view.html?src=src\tweens\timelines\simple%20timeline%206.js
   }
 
@@ -48,31 +49,126 @@ export default class Game extends Phaser.Scene {
     this.anims.create({
       key: 'dogsniff',
       frames: [
-          { key: 'dogsniff0' },
-          { key: 'dogsniff1' },
-          { key: 'dogsniff2' },
-          { key: 'dogsniff3' },
-          { key: 'dogsniff4', duration: 50 }
+        { key: 'dogsniff0' },
+        { key: 'dogsniff1' },
+        { key: 'dogsniff2' },
+        { key: 'dogsniff3' },
+        { key: 'dogsniff4', duration: 50 }
       ],
       frameRate: 10,
       repeat: -1
     });
 
-    const dogSniff = this.add.sprite(0, 530, 'dogsniff0').play('dogsniff');
+    let dogSniff = this.add.sprite(0, 530, 'dogsniff0').play('dogsniff');
 
     this.tweens.add({
       targets: dogSniff,
-      x: 400,
-      duration: 7000,
+      x: GAME_WIDTH / 2,
+      duration: 6000,
       ease: 'Power2',
       loop: 0,
       onComplete: () => {
-        // Activate dog jumping sprite
+        // Activate dog jump sprite & bark sound
+        let dogBarkSound = this.sound.add('dog_bark_sound');
+        dogBarkSound.play();
+        dogSniff.destroy();
+
+        let dogBark = this.add.image(GAME_WIDTH / 2, 530, 'dog_bark');
+
+        dogBarkSound.once('ended', () => {
+          dogBark.destroy();
+          this.addDogJumpAnimation();
+        });
       }
     });
   }
 
-  missShot() {
-    
+  addDogJumpAnimation() {
+    this.anims.create({
+      key: 'dog_jump',
+      frames: [
+        { key: 'dog_jump0', duration: 200 },
+        { key: 'dog_jump1', duration: 500 }
+      ],
+      frameRate: 2,
+      repeat: -1
+    });
+
+    let dogJump = this.add.sprite(GAME_WIDTH / 2, 540, 'dog_jump0').play('dog_jump');
+
+    this.tweens.add({
+      targets: dogJump,
+      y: 400,
+      duration: 500,
+      ease: 'Power2',
+      yoyo: true,
+      loop: 0,
+      onYoyo: () => {
+        dogJump.setDepth(-1);
+      },
+      onComplete: () => {
+        this.spawnDuck();
+      }
+    });
+  }
+
+  spawnDuck() {
+    let ducks = ['black', 'red'];
+    // TODO: random the ducks
+
+
+    this.anims.create({
+      key: 'duck_black_left',
+      frames: [
+        { key: 'duck_black_left0' },
+        { key: 'duck_black_left1' },
+        { key: 'duck_black_left2' }
+      ],
+      frameRate: 10,
+      repeat: -1
+    });
+
+    let duck = this.add.sprite(GAME_WIDTH / 2, 400, 'duck_black_left0').play('duck_black_left');
+
+    this.tweens.timeline({
+      targets: duck,
+      ease: 'Linear',
+      duration: 2000,
+      tweens: [
+        {
+          x: 600
+        },
+        {
+          y: 500,
+          offset: '-=1000'
+        },
+        {
+          x: 100,
+          offset: '-=1000'
+        },
+        {
+          y: 100,
+          offset: '-=1000'
+        }
+      ]
+
+    });
+
+  }
+
+  hitDuck() {
+
+  }
+
+  missedShot() {
+
+  }
+
+  gameOver() {
+
+  }
+
+  levelFinished() {
+
   }
 }
